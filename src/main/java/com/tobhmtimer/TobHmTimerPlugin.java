@@ -24,7 +24,7 @@ import net.runelite.client.util.Text;
 
 @Slf4j
 @PluginDescriptor(
-	name = "TOB Hard Mode Timer"
+	name = "TOB HM Timer"
 )
 public class TobHmTimerPlugin extends Plugin
 {
