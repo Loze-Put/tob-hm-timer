@@ -42,16 +42,14 @@ public class TobHmTimerPlugin extends Plugin
 
 	private static final Pattern DIGIT_PATTERN = Pattern.compile("(\\d+)");
 
+	private int tobVarbit = 0;
+
 	@Getter
-	private boolean insideTob = false;
+	private TobTimer timer = new TobTimer();
 	@Getter
-	private boolean raidActive = false;
+	private boolean showOverlay = false;
 	@Getter
 	private boolean raidSucceeded = false;
-
-	private int tobVarbit = 0;
-	private long ticksElapsed = 0;
-
 	@Getter
 	private Duration timeToBeat = Duration.ZERO;
 	@Getter
@@ -67,11 +65,6 @@ public class TobHmTimerPlugin extends Plugin
 	@Getter
 	private Duration splitVerzik;
 
-	public Duration getElapsedTime()
-	{
-		return getDurationFromTicks(ticksElapsed);
-	}
-
 	@Override
 	protected void startUp() throws Exception
 	{
@@ -82,7 +75,7 @@ public class TobHmTimerPlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		reset();
-		insideTob = false;
+		showOverlay = false;
 		overlayManager.remove(overlay);
 	}
 
@@ -96,7 +89,11 @@ public class TobHmTimerPlugin extends Plugin
 
 		String message = Text.removeTags(event.getMessage());
 
-		if (message.startsWith(MESSAGE_RAID_STARTED))
+		if (message.startsWith(MESSAGE_RAID_ENTERED))
+		{
+			showOverlay = true;
+		}
+		else if (message.startsWith(MESSAGE_RAID_STARTED))
 		{
 			Duration time = parseTime(message);
 
@@ -109,34 +106,34 @@ public class TobHmTimerPlugin extends Plugin
 			return;
 		}
 
-		if (!raidActive)
+		if (!timer.isActive())
 		{
 			return;
 		}
 
 		if (message.startsWith(MESSAGE_SPLIT_MAIDEN))
 		{
-			splitMaiden = getDurationFromTicks(ticksElapsed);
+			splitMaiden = timer.getGameTime();
 		}
 		else if (message.startsWith(MESSAGE_SPLIT_BLOAT))
 		{
-			splitBloat = getDurationFromTicks(ticksElapsed);
+			splitBloat = timer.getGameTime();
 		}
 		else if (message.startsWith(MESSAGE_SPLIT_NYLOCAS))
 		{
-			splitNylocas = getDurationFromTicks(ticksElapsed);
+			splitNylocas = timer.getGameTime();
 		}
 		else if (message.startsWith(MESSAGE_SPLIT_SOTETSEG))
 		{
-			splitSotetseg = getDurationFromTicks(ticksElapsed);
+			splitSotetseg = timer.getGameTime();
 		}
 		else if (message.startsWith(MESSAGE_SPLIT_XARPUS))
 		{
-			splitXarpus = getDurationFromTicks(ticksElapsed);
+			splitXarpus = timer.getGameTime();
 		}
 		else if (message.startsWith(MESSAGE_RAID_COMPLETED))
 		{
-			splitVerzik = getDurationFromTicks(ticksElapsed);
+			splitVerzik = timer.getGameTime();
 			completeRaid(true);
 		}
 	}
@@ -144,10 +141,7 @@ public class TobHmTimerPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick tick)
 	{
-		if (raidActive)
-		{
-			ticksElapsed++;
-		}
+		timer.tick();
 	}
 
 	@Subscribe
@@ -157,14 +151,8 @@ public class TobHmTimerPlugin extends Plugin
 
 		if (tobVarbit != nextTobVarBit)
 		{
-			// The player walked into the theatre.
-			if (tobVarbit == STATE_IN_PARTY && nextTobVarBit == STATE_INSIDE_OR_SPECTATING)
-			{
-				insideTob = true;
-			}
-
 			// The player has left the theatre.
-			else if (nextTobVarBit == STATE_IN_PARTY && raidActive)
+			if (nextTobVarBit == STATE_IN_PARTY && timer.isActive())
 			{
 				completeRaid(false);
 			}
@@ -172,7 +160,7 @@ public class TobHmTimerPlugin extends Plugin
 			// The player has left their party.
 			else if (nextTobVarBit == STATE_NO_PARTY)
 			{
-				insideTob = false;
+				showOverlay = false;
 				reset();
 			}
 
@@ -186,7 +174,31 @@ public class TobHmTimerPlugin extends Plugin
 		return configManager.getConfig(TobHmTimerConfig.class);
 	}
 
-	private Duration parseTime(String timeString)
+	private void startRaid()
+	{
+		reset();
+		timer.start();
+	}
+
+	private void completeRaid(boolean succeeded)
+	{
+		timer.stop();
+		raidSucceeded = succeeded;
+	}
+
+	private void reset()
+	{
+		timer.reset();
+		raidSucceeded = false;
+		splitMaiden = null;
+		splitBloat = null;
+		splitNylocas = null;
+		splitSotetseg = null;
+		splitXarpus = null;
+		splitVerzik = null;
+	}
+
+	private static Duration parseTime(String timeString)
 	{
 		Matcher digitMatcher = DIGIT_PATTERN.matcher(timeString);
 
@@ -210,35 +222,5 @@ public class TobHmTimerPlugin extends Plugin
 		}
 
 		return null;
-	}
-
-	private void startRaid()
-	{
-		reset();
-		raidActive = true;
-	}
-
-	private void completeRaid(boolean succeeded)
-	{
-		raidActive = false;
-		raidSucceeded = succeeded;
-	}
-
-	private void reset()
-	{
-		ticksElapsed = 0;
-		raidActive = false;
-		raidSucceeded = false;
-		splitMaiden = null;
-		splitBloat = null;
-		splitNylocas = null;
-		splitSotetseg = null;
-		splitXarpus = null;
-		splitVerzik = null;
-	}
-
-	private static Duration getDurationFromTicks(long ticks)
-	{
-		return Duration.ofMillis(MILLIS_PER_TICK * ticks);
 	}
 }
