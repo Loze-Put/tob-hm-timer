@@ -30,7 +30,7 @@ class TobHmTimerOverlay extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (!plugin.isInsideTob() && !config.alwaysShow())
+		if (!plugin.isShowOverlay() && !config.alwaysShow())
 		{
 			return null;
 		}
@@ -38,11 +38,11 @@ class TobHmTimerOverlay extends OverlayPanel
 		longestString = "";
 
 		Duration timeToBeat = plugin.getTimeToBeat();
-		Duration tickElapsedTime = plugin.getElapsedTime();
+		Duration elapsedTime = plugin.getTimer().getRealTime();
 
-		Color timeColor = tickElapsedTime.compareTo(timeToBeat) >= 0
+		Color timeColor = elapsedTime.compareTo(timeToBeat) >= 0
 			? Color.RED
-			: !plugin.isRaidActive() && plugin.isRaidSucceeded()
+			: !plugin.getTimer().isActive() && plugin.isRaidSucceeded()
 			? Color.GREEN : Color.WHITE;
 
 		if (config.showTimeToBeat())
@@ -55,15 +55,15 @@ class TobHmTimerOverlay extends OverlayPanel
 		if (config.showTimeElapsed())
 		{
 			panelComponent.getChildren().add(
-				createLineComponent("Elapsed ", tickElapsedTime, timeColor)
+				createLineComponent("Elapsed ", elapsedTime, timeColor)
 			);
 		}
 
 		if (config.showTimeRemaining())
 		{
-			Duration tickTimeRemaining = timeToBeat.minus(tickElapsedTime);
+			Duration timeRemaining = timeToBeat.minus(elapsedTime);
 			panelComponent.getChildren().add(
-				createLineComponent("Remaining ", tickTimeRemaining, timeColor)
+				createLineComponent("Remaining ", timeRemaining, timeColor)
 			);
 		}
 
