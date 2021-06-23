@@ -7,7 +7,6 @@ public final class TobHmTimerConstants
 	// Theatre of blood varbit states.
 	public static final int STATE_NO_PARTY = 0;
 	public static final int STATE_IN_PARTY = 1;
-	public static final int STATE_INSIDE_OR_SPECTATING = 2;
 
 	// Game messages
 	public static final String MESSAGE_RAID_ENTERED = "You enter the Theatre of Blood (Hard Mode)";
