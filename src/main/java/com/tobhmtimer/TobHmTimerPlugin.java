@@ -99,7 +99,7 @@ public class TobHmTimerPlugin extends Plugin
 
 			if (time != null)
 			{
-				timeToBeat = time;
+				startRaid(time);
 			}
 
 			return;
@@ -150,19 +150,13 @@ public class TobHmTimerPlugin extends Plugin
 
 		if (tobVarbit != nextTobVarBit)
 		{
-			// The party leader has started the raid.
-			if (nextTobVarBit == STATE_INSIDE_OR_SPECTATING)
-			{
-				startRaid();
-			}
-
-			// The player has left the theatre.
+			// The party has wiped.
 			if (nextTobVarBit == STATE_IN_PARTY && timer.isActive())
 			{
 				completeRaid(false);
 			}
 
-			// The player has left their party.
+			// The player has left their party or has resigned.
 			else if (nextTobVarBit == STATE_NO_PARTY)
 			{
 				showOverlay = false;
@@ -179,9 +173,10 @@ public class TobHmTimerPlugin extends Plugin
 		return configManager.getConfig(TobHmTimerConfig.class);
 	}
 
-	private void startRaid()
+	private void startRaid(Duration timeToBeat)
 	{
 		reset();
+		this.timeToBeat = timeToBeat;
 		timer.start();
 	}
 

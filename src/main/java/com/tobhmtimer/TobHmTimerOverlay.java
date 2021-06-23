@@ -40,22 +40,28 @@ class TobHmTimerOverlay extends OverlayPanel
 		Duration timeToBeat = plugin.getTimeToBeat();
 		Duration elapsedTime = plugin.getTimer().getRealTime();
 
-		Color timeColor = elapsedTime.compareTo(timeToBeat) >= 0
-			? Color.RED
-			: !plugin.getTimer().isActive() && plugin.isRaidSucceeded()
-			? Color.GREEN : Color.WHITE;
+		Color timeColor = Color.WHITE;
+
+		if (elapsedTime.compareTo(timeToBeat) >= 0 && !timeToBeat.isZero())
+		{
+			timeColor = Color.RED;
+		}
+		else if (!plugin.getTimer().isActive() && plugin.isRaidSucceeded())
+		{
+			timeColor = Color.GREEN;
+		}
 
 		if (config.showTimeToBeat())
 		{
 			panelComponent.getChildren().add(
-				createLineComponent("To beat ", timeToBeat)
+				createLineComponent("To beat", timeToBeat)
 			);
 		}
 
 		if (config.showTimeElapsed())
 		{
 			panelComponent.getChildren().add(
-				createLineComponent("Elapsed ", elapsedTime, timeColor)
+				createLineComponent("Elapsed", elapsedTime, timeColor)
 			);
 		}
 
@@ -63,7 +69,7 @@ class TobHmTimerOverlay extends OverlayPanel
 		{
 			Duration timeRemaining = timeToBeat.minus(elapsedTime);
 			panelComponent.getChildren().add(
-				createLineComponent("Remaining ", timeRemaining, timeColor)
+				createLineComponent("Remaining", timeRemaining, timeColor)
 			);
 		}
 
@@ -75,22 +81,22 @@ class TobHmTimerOverlay extends OverlayPanel
 			}
 
 			panelComponent.getChildren().add(
-				createLineComponent("Maiden ", plugin.getSplitMaiden())
+				createLineComponent("Maiden", plugin.getSplitMaiden())
 			);
 			panelComponent.getChildren().add(
-				createLineComponent("Bloat ", plugin.getSplitBloat())
+				createLineComponent("Bloat", plugin.getSplitBloat())
 			);
 			panelComponent.getChildren().add(
-				createLineComponent("Nylocas ", plugin.getSplitNylocas())
+				createLineComponent("Nylocas", plugin.getSplitNylocas())
 			);
 			panelComponent.getChildren().add(
-				createLineComponent("Sotetseg ", plugin.getSplitSotetseg())
+				createLineComponent("Sotetseg", plugin.getSplitSotetseg())
 			);
 			panelComponent.getChildren().add(
-				createLineComponent("Xarpus ", plugin.getSplitXarpus())
+				createLineComponent("Xarpus", plugin.getSplitXarpus())
 			);
 			panelComponent.getChildren().add(
-				createLineComponent("Verzik ", plugin.getSplitVerzik())
+				createLineComponent("Verzik", plugin.getSplitVerzik())
 			);
 		}
 
@@ -115,12 +121,14 @@ class TobHmTimerOverlay extends OverlayPanel
 
 		if (config.showTimeDescription())
 		{
-			builder
-				.left(description)
-				.right(timeString)
-				.rightColor(color);
+			description = " " + description;
 
-			setLongestString(description + timeString);
+			builder
+				.left(timeString)
+				.leftColor(color)
+				.right(description);
+
+			setLongestString(timeString + description);
 		}
 		else
 		{
