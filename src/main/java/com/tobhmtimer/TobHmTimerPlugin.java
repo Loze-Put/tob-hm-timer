@@ -89,6 +89,12 @@ public class TobHmTimerPlugin extends Plugin
 
 		String message = Text.removeTags(event.getMessage());
 
+		if (message.equals(MESSAGE_LEFT_LOBBY))
+		{
+			showOverlay = false;
+			return;
+		}
+
 		if (message.startsWith(MESSAGE_RAID_ENTERED))
 		{
 			showOverlay = true;
@@ -146,7 +152,7 @@ public class TobHmTimerPlugin extends Plugin
 	@Subscribe
 	public void onVarbitChanged(VarbitChanged event)
 	{
-		int nextTobVarBit = client.getVar(Varbits.THEATRE_OF_BLOOD);
+		int nextTobVarBit = client.getVarbitValue(Varbits.THEATRE_OF_BLOOD);
 
 		if (tobVarbit != nextTobVarBit)
 		{

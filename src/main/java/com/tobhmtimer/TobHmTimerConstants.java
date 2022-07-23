@@ -9,6 +9,7 @@ public final class TobHmTimerConstants
 	public static final int STATE_IN_PARTY = 1;
 
 	// Game messages
+	public static final String MESSAGE_LEFT_LOBBY = "You have left the lobby, so you have been removed from your party.";
 	public static final String MESSAGE_RAID_ENTERED = "You enter the Theatre of Blood (Hard Mode)";
 	public static final String MESSAGE_RAID_STARTED = "Time to beat:";
 	public static final String MESSAGE_SPLIT_MAIDEN = "Wave 'The Maiden of Sugadinti' (Hard Mode) complete!";
