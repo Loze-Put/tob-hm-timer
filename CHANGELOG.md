@@ -2,6 +2,10 @@
 All notable changes to this plugin will be documented in this file.
 
 ----------------------------------------------------------------------
+## [1.0.2] - 2022-07-23
+### Fixed
+- Fixed an issue where the overlay would not disappear when leaving the TOB lobby.
+
 ## [1.0.1] - 2021-06-23
 ### Changed
 - Updated the timer to work with the [Runescape update](https://secure.runescape.com/m=news/new-client-features-milestone-1?oldschool=1).
